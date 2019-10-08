@@ -1,29 +1,79 @@
-/*
-  DigitalReadSerial
 
-  Reads a digital input on pin 2, prints the result to the Serial Monitor
+#include <Servo.h>
+Servo myservo;
+#define servo 9
 
-  This example code is in the public domain.
+#define btn1 8
+#define btn2 6
 
-  http://www.arduino.cc/en/Tutorial/DigitalReadSerial
-*/
+#define off 1
+#define half 2
+#define full 3
 
-// digital pin 2 has a pushbutton attached to it. Give it a name:
-int pushButton = 2;
+#define forwards 1
+#define backwards 2
 
-// the setup routine runs once when you press reset:
+
+
 void setup() {
-  // initialize serial communication at 9600 bits per second:
   Serial.begin(9600);
-  // make the pushbutton's pin an input:
-  pinMode(pushButton, INPUT);
+ 
+  //myservo.attach(servo); //Attach servo to pin 9
+
+  pinMode(btn1, INPUT);
+  pinMode(btn2, INPUT);
+
+  Serial.println("Set-up");
 }
 
-// the loop routine runs over and over again forever:
 void loop() {
-  // read the input pin:
-  int buttonState = digitalRead(pushButton);
-  // print out the state of the button:
-  Serial.println(buttonState);
-  delay(1);        // delay in between reads for stability
+  static int myspeed[] = {off, half, full, half};      //Speed array
+  static int speedpos = 1;                                  //Sets where in speed array
+  
+  int btn1state = digitalRead(btn1);            //Direction Button
+  int btn2state = digitalRead(btn2);            //Speed Button
+  /*
+  potent = analogRead(servo)                    //reads potentiometer
+  scalepotent = map(potent, 0, 1023, 0, 180);   //scale servo to motor (0-180)
+  */
+
+  //Speed Array Shift
+  if (btn2state == HIGH){               //Button 2 Pressed
+    Serial.println("Shift");
+    if (speedpos < 4){                  //Position is w/in speed array
+      speedpos = speedpos +1;
+      Serial.println("Shift Up");
+    }
+    else if (speedpos = 4){            //Position reset
+      speedpos = 1;
+      Serial.println("Reset Shift");
+    }
+    else
+    Serial.println("Error Shifting");
+  }
+
+
+  //Direction Determination
+  if (btn1state == LOW){                           //Button 1 Not Pressed => Forwards
+    Serial.println("Forwards");
+    MotorSpeed(myspeed, speedpos, forwards);
+  }
+  else if (btn1state == HIGH){                    //Button 1 Pressed => Backwards
+    Serial.println("Backwards"); 
+    MotorSpeed(myspeed, speedpos, backwards);
+  }
+}
+
+void MotorSpeed(int myspeed[], int speedpos, int mydirection ){
+
+  if(myspeed[speedpos] == off){                 //Turn Motor Off
+    Serial.println("Off");
+  }
+  else if(myspeed[speedpos] == half){          //Turn Motor On - Half Speed
+    Serial.println("Half");
+  }
+  else if(myspeed[speedpos] == full){         //Turn Motor On - Full Speed
+    Serial.println("Full");
+  }
+  
 }
