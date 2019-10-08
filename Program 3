@@ -1,0 +1,154 @@
+//button states
+#define ButtonState_Up      1
+#define ButtonState_Pressed 2 
+#define ButtonState_Down    3
+#define ButtonState_Released 4
+
+//map button high/low to up/down
+#define ButtonRead_Up 1
+#define ButtonRead_Down 2
+
+//Define Buttons
+#define ButtonA 8
+#define ButtonB 7
+#define Buzz 2
+
+//
+#define Pressed 1
+#define Released 0
+
+void setup() {
+  // initialize the buttons as an input:
+  pinMode(ButtonA, INPUT);
+  pinMode(ButtonB, INPUT);
+
+  pinMode(Buzz, OUTPUT);
+  
+  Serial.begin(9600);
+  Serial.println("Welcome to the button press example");
+}
+
+int UpdateButtonState(int iButtonState, int iNewButtonRead)
+{
+  if(iButtonState == ButtonState_Up && iNewButtonRead == ButtonRead_Down)
+   {
+      //Serial.println("Button Down");
+      return ButtonState_Pressed;
+   }
+  else if(iButtonState == ButtonState_Pressed)
+   {
+    //Serial.println("Pressed");
+    return ButtonState_Down;
+   }
+  else if(iButtonState == ButtonState_Down && iNewButtonRead == ButtonRead_Up)
+  {
+    //Serial.println("Released");
+    return ButtonState_Released;
+  }
+  else if(iButtonState == ButtonState_Released)
+  {
+    //Serial.println("Button Up");
+    return ButtonState_Up;
+  }
+  return iButtonState;
+}
+
+int checkButton(int iButtonPin)
+{
+  int newButtonRead = digitalRead(iButtonPin);
+  delay(10);
+  int debounceButtonRead = digitalRead(iButtonPin);
+  if(newButtonRead != debounceButtonRead)
+    return -1;//button is not stable
+
+  if(newButtonRead == LOW) //Button is active low, ie using pullup
+    return ButtonRead_Down;
+  return ButtonRead_Up;
+}
+
+
+int ButtonAFunct(int buttonPin)
+{
+  //init value of state machine
+  static int buttonAState = ButtonState_Up;
+  //keep track of the times a press occurs
+  /*Serial.print("Current State: ");//debug prints
+  Serial.print(button1State);
+  Serial.print(" Button Read: ");
+  Serial.println(checkButton(buttonPin));*/
+  buttonAState = UpdateButtonState(buttonAState,
+                        checkButton(buttonPin));  
+  /*Serial.print("New State: ");//debug prints
+  Serial.println(button1State); */
+
+  //check the states
+  if (buttonAState == ButtonState_Pressed) {
+    //Serial.println("Button A Pressed");
+    return Pressed;
+  } 
+  else if(buttonAState == ButtonState_Released) {
+    //Serial.println("Button A Released ");
+    return Released;
+  }
+}
+
+int ButtonBFunct(int buttonPin)
+{
+  //init value of state machine
+  static int buttonBState = ButtonState_Up;
+  //keep track of the times a press occurs
+  /*Serial.print("Current State: ");//debug prints
+  Serial.print(button1State);
+  Serial.print(" Button Read: ");
+  Serial.println(checkButton(buttonPin));*/
+  buttonBState = UpdateButtonState(buttonBState,
+                        checkButton(buttonPin));  
+  /*Serial.print("New State: ");//debug prints
+  Serial.println(button1State); */
+
+  //check the states
+  if (buttonBState == ButtonState_Pressed) {
+    //Serial.println("Button B Pressed");
+    return 1;
+    
+  } 
+  else if(buttonBState == ButtonState_Released) {
+    //Serial.println("Button B Released ");
+    return 0;
+    
+  }
+}
+
+void loop() {
+  
+  int StateA = ButtonBFunct(ButtonB);
+    //Serial.println(StateA);
+  int StateB =ButtonAFunct(ButtonA);
+    //Serial.println(StateB);
+
+    if (StateA == 1 && StateB == 1)
+     {
+      Serial.println(3);
+    //digitalWrite(Buzz, HIGH);
+      tone(Buzz, 35);
+      
+     }
+    else if(StateA == 1 && StateB == 0)
+    {
+      Serial.println(1);
+    //digitalWrite(Buzz, LOW);
+      noTone(Buzz);
+      
+    }
+    else if(StateB == 1 && StateA == 0)
+    {
+      Serial.println(2);
+      //digitalWrite(Buzz, LOW);
+      noTone(Buzz);
+    }
+    else
+    {
+      noTone(Buzz);
+    }
+
+}
