@@ -1,21 +1,20 @@
-#include <Servo.h>  //Library
-
-#define servo 9
-
-Servo myservo;     //Servo Setup
-
-void setup() {
+//Button
+int btn = 8;
+int count = 0;
+// the setup function runs once when you press reset or power the board
+void setup () {
   Serial.begin(9600);
-  //myservo.attach(servo); //Attach to Pin 9
-  
+  pinMode(btn, INPUT);
 }
 
+// the loop function runs over and over again forever
 void loop() {
-  
-  int potent = analogRead(servo);                    //reads potentiometer
-  int scalepotent = map(potent, 0, 1023, 0, 180);   //scale servo to motor (0-180)
-
-  myservo.write(scalepotent);                  //Sends position to servo
-  delay(10);                                   //Gives time for servo to get to position
-
+  if (digitalRead(btn))
+  {
+    count++;
+    Serial.print("count equals");
+    Serial.println(count);
+    delay(200);
+  }
+  delay(100);
 }
