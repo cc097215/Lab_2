@@ -1,0 +1,21 @@
+// Maths
+int a=1;
+int k=5;
+// the setup function runs once when you press reset or power the board
+void setup () {
+  Serial.begin(9600);
+  math();
+}
+
+//the loop function runs over and over again forever
+void loop() {
+}
+
+void math() {
+  for(int i=0;i<k;i++)
+{
+  Serial.print("a equals ");
+  Serial.println(a);
+  a++;
+}
+}
